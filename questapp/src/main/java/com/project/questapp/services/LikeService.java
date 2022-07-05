@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.project.questapp.entities.Like;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.project.questapp.entities.Post;
@@ -21,10 +22,12 @@ public class LikeService {
     private UserService userService;
     private PostService postService;
 
-    public LikeService(LikeRepository likeRepository, UserService userService,
-                       PostService postService) {
+    public LikeService(LikeRepository likeRepository, UserService userService) {
         this.likeRepository = likeRepository;
         this.userService = userService;
+    }
+    @Autowired
+    public void setPostService(PostService postService){
         this.postService = postService;
     }
 
@@ -38,7 +41,7 @@ public class LikeService {
             list = likeRepository.findByPostId(postId.get());
         }else
             list = likeRepository.findAll();
-        return list.stream().map(like -> new LikeResponse(like)).collect(Collectors.toList());
+        return list.stream().map(LikeResponse::new).collect(Collectors.toList());
     }
 
     public Like getOneLikeById(Long LikeId) {

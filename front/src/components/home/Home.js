@@ -1,4 +1,3 @@
-import { Container } from '@mui/material'
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import Post from '../post/Post'
@@ -32,13 +31,14 @@ function Home() {
           : <>
             <PostForm fetchData={fetchData} userId={1} userName={"furkan"} />
             {postList.map((post, index) => {
-              return <Post postId={post.id}
+              return <Post likes={post.postLikes} postId={post.id}
                 userId={post.userId}
                 userName={post.userName}
                 key={index}
                 title={post.title}
                 text={post.text} />
             })}
+
           </>
       }
     </div>
