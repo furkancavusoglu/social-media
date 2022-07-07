@@ -34,7 +34,7 @@ public class UserService {
         if (userD.isPresent()) {
             User foundUser = userD.get();
             foundUser.setPassword(user.getPassword());
-            foundUser.setUsername(user.getUsername());
+            foundUser.setUserName(user.getUserName());
             userRepository.save(foundUser);
             return foundUser;
         } else
@@ -43,5 +43,9 @@ public class UserService {
 
     public void deleteById(Long userId) {
         userRepository.deleteById(userId);
+    }
+
+    public User getOneUserByUserName(String userName) {
+        return userRepository.findByUserName(userName);
     }
 }

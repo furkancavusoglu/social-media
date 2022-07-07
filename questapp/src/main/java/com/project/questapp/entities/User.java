@@ -5,7 +5,7 @@ import lombok.Data;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "Users")
+@Table(name = "user_table")
 @Data
 public class User {
 
@@ -13,6 +13,6 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    String username;
+    String userName;
     String password;
 }
