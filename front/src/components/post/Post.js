@@ -36,10 +36,11 @@ function Post({ title, text, userName, userId, postId, likes }) {
     const isInitialMount = useRef(true)
     const [likeId, setLikeId] = useState();
 
+    let disabled = localStorage.getItem("currentUser") === null ? true : false
+
     const handleExpandClick = () => {
         setExpanded(!expanded)
         refreshComments()
-        console.log(commentList);
     };
     const handleLike = () => {
         setLiked(!liked)
@@ -52,7 +53,7 @@ function Post({ title, text, userName, userId, postId, likes }) {
         }
     }
     const checkLikes = () => {
-        let likeControl = likes.find(like => like.userId === userId)
+        let likeControl = likes.find(like => ""+like.userId === localStorage.getItem("currentUser"))
         if (likeControl != null) {
             setLikeId(likeControl.id)
             setLiked(likeControl)
@@ -60,10 +61,17 @@ function Post({ title, text, userName, userId, postId, likes }) {
     }
 
     const saveLike = () => {
-        axios.post("/likes", { postId: postId, userId: userId })
+        axios.post("/likes",
+            { postId: postId, userId: localStorage.getItem("currentUser") }, {
+            headers:
+                { 'Authorization': localStorage.getItem("tokenKey") }
+        })
     }
     const deleteLike = () => {
-        axios.delete(`/likes/${likeId}`)
+        axios.delete(`/likes/${likeId}`, {
+            headers:
+                { 'Authorization': localStorage.getItem("tokenKey") }
+        })
     }
 
     const refreshComments = async () => {
@@ -108,7 +116,7 @@ function Post({ title, text, userName, userId, postId, likes }) {
                 </Typography>
             </CardContent>
             <CardActions disableSpacing>
-                <IconButton onClick={handleLike} aria-label="add to favorites">
+                <IconButton disabled={disabled} onClick={handleLike} aria-label="add to favorites">
                     <FavoriteIcon style={liked ? { color: "red" } : null} />
                 </IconButton>
                 {likeCount}
@@ -126,7 +134,8 @@ function Post({ title, text, userName, userId, postId, likes }) {
                         isLoaded ? commentList.map(comment => (
                             <Comment userId={1} userName={"USER"} text={comment.text}></Comment>
                         )) : "Loading"}
-                    <CommentForm userId={1} userName={"USER"} text={"text"} postId={postId} ></CommentForm>
+                    {disabled ? "" :
+                        <CommentForm userId={userId} userName={userName} postId={postId} ></CommentForm>}
                 </Container>
             </Collapse>
         </Card >

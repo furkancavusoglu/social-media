@@ -16,7 +16,10 @@ const CommentForm = ({ userId, userName, postId }) => {
 
   const saveComment = () => {
     try {
-      axios.post("/comments", { postId: postId, userId: userId, text: text })
+      axios.post("/comments", { postId: postId, userId: userId, text: text },{
+          headers:
+            { 'Authorization': localStorage.getItem("tokenKey") }
+        })
 
     } catch (error) {
       console.log("Error in commenting ");

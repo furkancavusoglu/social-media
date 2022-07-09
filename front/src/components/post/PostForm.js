@@ -22,13 +22,15 @@ function PostForm({ userName, userId, fetchData }) {
 
     const handleSubmit = () => {
         try {
-            axios.post("/posts", { title: title, userId: userId, text: text })
+            axios.post("/posts", { title: title, userId: userId, text: text }, {
+                headers:
+                    { 'Authorization': localStorage.getItem("tokenKey") }
+            })
             setIsSent(true)
-            fetchData()
             setText("")
             setTitle("")
         } catch (error) {
-            console.log("Error in posting ");
+            console.log(error);
         }
     }
     const handleClose = (event, reason) => {

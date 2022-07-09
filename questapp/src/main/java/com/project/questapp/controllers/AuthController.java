@@ -2,6 +2,7 @@ package com.project.questapp.controllers;
 
 import com.project.questapp.entities.User;
 import com.project.questapp.requests.UserRequest;
+import com.project.questapp.responses.AuthResponse;
 import com.project.questapp.security.JwtTokenProvider;
 import com.project.questapp.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,23 +41,31 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody UserRequest request) {
-        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(request.getUserName(), request.getPassword());
+    public AuthResponse login(@RequestBody UserRequest loginRequest) {
+        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(loginRequest.getUserName(), loginRequest.getPassword());
         Authentication auth = authenticationManager.authenticate(authToken);
         SecurityContextHolder.getContext().setAuthentication(auth);
-        return "Bearer " + jwtTokenProvider.generateJwtToken(auth);
+        String jwtToken = jwtTokenProvider.generateJwtToken(auth);
+        User user = userService.getOneUserByUserName(loginRequest.getUserName());
+        AuthResponse authResponse = new AuthResponse();
+        authResponse.setMessage("Bearer " + jwtToken);
+        authResponse.setUserId(user.getId());
+        return authResponse;
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody UserRequest request) {
+    public ResponseEntity<AuthResponse> register(@RequestBody UserRequest request) {
+        AuthResponse response = new AuthResponse();
         if (userService.getOneUserByUserName(request.getUserName()) != null) {
-            return new ResponseEntity<>("Username already in use", HttpStatus.BAD_REQUEST);
+            response.setMessage("Username already in use");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
-        System.out.println(request.getPassword()+" :"+request.getUserName());
         User user = new User();
         user.setUserName(request.getUserName());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         userService.saveOneUser(user);
-        return new ResponseEntity<>("User successfully registered", HttpStatus.CREATED);
+        response.setMessage("User successfully registered");
+        response.setUserId(user.getId());
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 }

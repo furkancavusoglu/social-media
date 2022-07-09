@@ -24,25 +24,23 @@ function Home() {
   useEffect(() => {
     fetchData()
   }, [postList])
-  return (
-    <div className='container'>
-      {error ? <h1>Error!</h1>
-        : !isLoaded ? <h1>Loading</h1>
-          : <>
-            <PostForm fetchData={fetchData} userId={1} userName={"furkan"} />
-            {postList.map((post, index) => {
-              return <Post likes={post.postLikes} postId={post.id}
-                userId={post.userId}
-                userName={post.userName}
-                key={index}
-                title={post.title}
-                text={post.text} />
-            })}
 
-          </>
-      }
-    </div>
-  )
+  if (error) {
+    return <div> Error !!!</div>;
+  } else if (!isLoaded) {
+    return <div> Loading... </div>;
+  } else {
+    return (
+      <div className="container">
+        {localStorage.getItem("currentUser") == null ? "" :
+          <PostForm userId={localStorage.getItem("currentUser")} userName={localStorage.getItem("userName")} />}
+        {postList.map(post => (
+          <Post likes={post.postLikes} postId={post.id} userId={post.userId} userName={post.userName}
+            title={post.title} text={post.text}></Post>
+        ))}
+      </div>
+    );
+  }
 }
 
-export default Home
+  export default Home
