@@ -24,7 +24,6 @@ public class JwtTokenProvider {
                 .setExpiration(expireDate)
                 .setIssuedAt(new Date())
                 .signWith(SignatureAlgorithm.HS512, APP_SECRET).compact();
-        //.signWith(SignatureAlgorithm.ES512, APP_SECRET).compact();
     }
 
     Long getUserIdFromJwt(String token) {
@@ -36,14 +35,6 @@ public class JwtTokenProvider {
         try {
             Jwts.parser().setSigningKey(APP_SECRET).parseClaimsJws(token);
             return !isTokenExpired(token);
-        } catch (MalformedJwtException e) {
-            return false;
-        } catch (ExpiredJwtException e) {
-            return false;
-        } catch (UnsupportedJwtException e) {
-            return false;
-        } catch (IllegalArgumentException e) {
-            return false;
         } catch (Exception e) {
             return false;
         }

@@ -11,6 +11,7 @@ import com.project.questapp.responses.PostResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -25,8 +26,9 @@ public class PostService {
         this.postRepository = postRepository;
         this.userService = userService;
     }
+
     @Autowired
-    public void setLikeService(LikeService likeService){
+    public void setLikeService(LikeService likeService) {
         this.likeService = likeService;
     }
 
@@ -38,12 +40,18 @@ public class PostService {
         list = postRepository.findAll();
         return list.stream().map(p -> {
             List<LikeResponse> likes = likeService.getAllLikesWithParam(Optional.empty(), Optional.of(p.getId()));
-            return new PostResponse(p,likes);
+            return new PostResponse(p, likes);
         }).collect(Collectors.toList());
     }
 
     public Post getOnePostById(Long postId) {
         return postRepository.findById(postId).orElse(null);
+    }
+
+    public PostResponse getOnePostByIdWithLikes(Long postId) {
+        Post post = postRepository.findById(postId).orElse(null);
+        List<LikeResponse> likes = likeService.getAllLikesWithParam(Optional.empty(), Optional.of(postId));
+        return new PostResponse(post, likes);
     }
 
     public Post createOnePost(PostCreateRequest newPost) {
@@ -55,6 +63,7 @@ public class PostService {
         toSave.setText(newPost.getText());
         toSave.setTitle(newPost.getTitle());
         toSave.setUser(user);
+        toSave.setCreateDate(new Date());
         return postRepository.save(toSave);
     }
 
