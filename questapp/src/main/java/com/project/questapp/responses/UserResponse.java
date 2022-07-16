@@ -11,12 +11,12 @@ import lombok.NoArgsConstructor;
 public class UserResponse {
     Long id;
     int avatarId;
-    String username;
+    String userName;
 
     public UserResponse(User user){
         this.id = user.getId();
         this.avatarId = user.getAvatar();
-        this.username = user.getUserName();
+        this.userName = user.getUserName();
     }
 
 }

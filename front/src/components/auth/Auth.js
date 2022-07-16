@@ -2,6 +2,7 @@ import { FormControl, Input, InputLabel, Button, FormHelperText } from '@mui/mat
 import axios from 'axios'
 import React, { useState } from 'react'
 import { useNavigate } from "react-router-dom";
+import { PostWithAuth } from '../../services/HttpService';
 
 const Auth = () => {
     const [userName, setUserName] = useState()
@@ -17,9 +18,9 @@ const Auth = () => {
 
 
     const sendRequest = async (path) => {
-        const response = await axios.post(`/auth/${path}`, { userName, password })
+        const response = await PostWithAuth(`/auth/${path}`, { userName, password })
         console.log(response.data);
-        localStorage.setItem("currentUser",response.data.userId)
+        localStorage.setItem("currentUser", response.data.userId)
         localStorage.setItem("tokenKey", response.data.message)
         localStorage.setItem("userName", userName)
     }
@@ -33,13 +34,13 @@ const Auth = () => {
             <Button
                 variant='contained'
                 style={{ marginTop: 60, background: "steelblue", color: "white" }}
-                onClick={()=>handleButton("register")}
+                onClick={() => handleButton("register")}
             >Register</Button>
             <FormHelperText style={{ margin: 20 }} >Are you already registered?</FormHelperText>
             <Button
                 variant='contained'
                 style={{ marginTop: 20, background: "steelblue", color: "white" }}
-                onClick={()=>handleButton("login")}
+                onClick={() => handleButton("login")}
             >Login</Button>
         </FormControl>
     )

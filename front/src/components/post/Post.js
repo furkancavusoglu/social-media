@@ -15,6 +15,7 @@ import axios from 'axios';
 import { Container } from '@mui/material';
 import Comment from '../comment/Comment';
 import CommentForm from '../comment/CommentForm';
+import { DeleteWithAuth, PostWithAuth } from '../../services/HttpService';
 
 const ExpandMore = styled((props) => {
     const { expand, ...other } = props;
@@ -34,6 +35,7 @@ function Post({ title, text, userName, userId, postId, likes }) {
     const [commentList, setCommentList] = useState([])
     const [likeCount, setLikeCount] = useState(likes.length)
     const isInitialMount = useRef(true)
+    const [refresh,setRefresh] = useState(false)
     const [likeId, setLikeId] = useState();
 
     let disabled = localStorage.getItem("currentUser") === null ? true : false
@@ -53,25 +55,18 @@ function Post({ title, text, userName, userId, postId, likes }) {
         }
     }
     const checkLikes = () => {
-        let likeControl = likes.find(like => ""+like.userId === localStorage.getItem("currentUser"))
+        let likeControl = likes.find(like => "" + like.userId === localStorage.getItem("currentUser"))
         if (likeControl != null) {
             setLikeId(likeControl.id)
             setLiked(likeControl)
         }
     }
 
-    const saveLike = () => {
-        axios.post("/likes",
-            { postId: postId, userId: localStorage.getItem("currentUser") }, {
-            headers:
-                { 'Authorization': localStorage.getItem("tokenKey") }
-        })
+    const saveLike = async () => {
+        await PostWithAuth("/likes", { postId: postId, userId: localStorage.getItem("currentUser") })
     }
-    const deleteLike = () => {
-        axios.delete(`/likes/${likeId}`, {
-            headers:
-                { 'Authorization': localStorage.getItem("tokenKey") }
-        })
+    const deleteLike = async () => {
+        await DeleteWithAuth(`/likes/${likeId}`)
     }
 
     const refreshComments = async () => {
@@ -79,10 +74,12 @@ function Post({ title, text, userName, userId, postId, likes }) {
             const response = await axios(`/comments?postId=${postId}`)
             setCommentList(response.data)
             setIsLoaded(true)
+
         } catch (error) {
             setIsLoaded(true)
             setError(error)
         }
+        setRefresh(false)
     }
 
     useEffect(() => {
@@ -91,14 +88,15 @@ function Post({ title, text, userName, userId, postId, likes }) {
         } else {
             refreshComments()
         }
-    }, [commentList])
-
-
+    }, [refresh])
 
     useEffect(() => {
         checkLikes()
     }, [])
 
+    const setCommentRefresh=()=>{
+        setRefresh(true)
+    }
 
     return (
         <Card sx={{ maxWidth: 800, margin: "20px", width: "600px", textAlign: "left", }}>
@@ -132,10 +130,11 @@ function Post({ title, text, userName, userId, postId, likes }) {
                 <Container fixed sx={{}} >
                     {error ? "error" :
                         isLoaded ? commentList.map(comment => (
-                            <Comment userId={1} userName={"USER"} text={comment.text}></Comment>
+                            <Comment userId={comment.userId} userName={comment.userName} text={comment.text}></Comment>
                         )) : "Loading"}
                     {disabled ? "" :
-                        <CommentForm userId={userId} userName={userName} postId={postId} ></CommentForm>}
+                        <CommentForm userId={localStorage.getItem("currentUser")} userName={localStorage.getItem("userName")}
+                         postId={postId} setCommentRefresh={setCommentRefresh} ></CommentForm>}
                 </Container>
             </Collapse>
         </Card >

@@ -4,26 +4,20 @@ import { Link } from "react-router-dom"
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import axios from 'axios';
+import { PostWithAuth } from '../../services/HttpService';
 
 
-const CommentForm = ({ userId, userName, postId }) => {
+const CommentForm = ({ userId, userName, postId, setCommentRefresh }) => {
   const [text, setText] = useState("")
 
   const handleSubmit = () => {
     saveComment()
     setText("")
+    setCommentRefresh()
   }
 
-  const saveComment = () => {
-    try {
-      axios.post("/comments", { postId: postId, userId: userId, text: text },{
-          headers:
-            { 'Authorization': localStorage.getItem("tokenKey") }
-        })
-
-    } catch (error) {
-      console.log("Error in commenting ");
-    }
+  const saveComment = async () => {
+    await PostWithAuth("/comments", { postId: postId, userId: userId, text: text })
   }
 
 

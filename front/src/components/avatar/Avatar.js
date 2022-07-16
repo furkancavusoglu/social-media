@@ -10,8 +10,9 @@ import { useState } from 'react';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import axios from 'axios';
+import { PutWithAuth } from '../../services/HttpService';
 
-const Avatar = ({ avatarId }) => {
+const Avatar = ({ avatarId, userId,userName }) => {
     const [open, setOpen] = useState(false)
     const [selectedValue, setSelectedValue] = useState(avatarId)
 
@@ -19,13 +20,7 @@ const Avatar = ({ avatarId }) => {
         setSelectedValue(e.target.value)
     }
     const saveAvatar = async () => {
-        const response = await axios.put(`/users/${localStorage.getItem("currentUser")}`,
-            { avatar: selectedValue },
-            {
-                headers: {
-                    "Authorization": localStorage.getItem("tokenKey")
-                }
-            })
+        const response = await PutWithAuth(`/users/${localStorage.getItem("currentUser")}`, { avatar: selectedValue })
         console.log(response);
     }
 
@@ -87,14 +82,15 @@ const Avatar = ({ avatarId }) => {
                 />
                 <CardContent>
                     <Typography gutterBottom variant="h5" component="div">
-                        Username
+                        {userName}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                         User Info
                     </Typography>
                 </CardContent>
                 <CardActions style={{ justifyContent: "center" }} >
-                    <Button size="small" onClick={handleOpen} >Change Avatar</Button>
+                    {localStorage.getItem("currentUser") === userId ?
+                        <Button size="small" onClick={handleOpen} >Change Avatar</Button> : null}
                 </CardActions>
             </Card>
         </>

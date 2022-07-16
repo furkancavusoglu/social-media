@@ -6,6 +6,7 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import Post from "../post/Post"
 import axios from "axios"
+import { GetWithAuth } from '../../services/HttpService';
 
 function PopUp({ isOpen, postId, setIsOpen }) {
     const [open, setOpen] = useState(false);
@@ -17,11 +18,7 @@ function PopUp({ isOpen, postId, setIsOpen }) {
 
     const getPost = async () => {
         try {
-            const response = await axios.get(`/posts/${postId}`, {
-                headers: {
-                    "Authorization": localStorage.getItem("tokenKey")
-                }
-            })
+            const response = await GetWithAuth(`/posts/${postId}`)
             console.log(response.data);
             setPost(response.data)
         } catch (error) {
@@ -80,13 +77,9 @@ const UserActivity = ({ userId }) => {
 
     const getActivity = async () => {
         try {
-            const response = await axios.get(`/users/activity/${userId}`, {
-                headers: {
-                    "Authorization": localStorage.getItem("tokenKey")
-                }
-            })
+            const response = await GetWithAuth(`/users/activity/${userId}`)
             setIsLoaded(true)
-            if(response.data!==""){
+            if (response.data !== "") {
                 setRows(response.data)
             }
         } catch (error) {
@@ -97,7 +90,7 @@ const UserActivity = ({ userId }) => {
     }
 
     return (
-        <> {isOpen? <PopUp isOpen={isOpen} postId={selectedPost} setIsOpen={setIsOpen} />:"" }
+        <> {isOpen ? <PopUp isOpen={isOpen} postId={selectedPost} setIsOpen={setIsOpen} /> : ""}
             <Paper sx={{ width: '100%' }}>
                 <TableContainer sx={{ maxHeight: 440 }}>
                     <Table stickyHeader aria-label="sticky table">

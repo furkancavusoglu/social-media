@@ -23,7 +23,7 @@ function Home() {
 
   useEffect(() => {
     fetchData()
-  }, [postList])
+  }, [])
 
   if (error) {
     return <div> Error !!!</div>;

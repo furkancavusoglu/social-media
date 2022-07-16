@@ -1,7 +1,5 @@
 package com.project.questapp.services;
 
-import com.project.questapp.entities.Comment;
-import com.project.questapp.entities.Like;
 import com.project.questapp.entities.User;
 import com.project.questapp.repos.CommentRepository;
 import com.project.questapp.repos.LikeRepository;
@@ -44,8 +42,12 @@ public class UserService {
         Optional<User> userD = userRepository.findById(userId);
         if (userD.isPresent()) {
             User foundUser = userD.get();
-            foundUser.setPassword(user.getPassword());
-            foundUser.setUserName(user.getUserName());
+            if (user.getPassword() != null ) {
+                foundUser.setPassword(user.getPassword());
+            }
+            if (user.getUserName() != null) {
+                foundUser.setUserName(user.getUserName());
+            }
             foundUser.setAvatar(user.getAvatar());
             userRepository.save(foundUser);
             return foundUser;

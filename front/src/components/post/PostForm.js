@@ -10,6 +10,7 @@ import MuiAlert from '@mui/material/Alert';
 import { Link } from "react-router-dom"
 import axios from 'axios'
 import React, { useState, useEffect } from 'react'
+import { PostWithAuth } from '../../services/HttpService';
 
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -20,18 +21,11 @@ function PostForm({ userName, userId, fetchData }) {
     const [title, setTitle] = useState("")
     const [isSent, setIsSent] = useState(false)
 
-    const handleSubmit = () => {
-        try {
-            axios.post("/posts", { title: title, userId: userId, text: text }, {
-                headers:
-                    { 'Authorization': localStorage.getItem("tokenKey") }
-            })
-            setIsSent(true)
-            setText("")
-            setTitle("")
-        } catch (error) {
-            console.log(error);
-        }
+    const handleSubmit = async () => {
+        await PostWithAuth("/posts", { title: title, userId: userId, text: text })
+        setIsSent(true)
+        setText("")
+        setTitle("")
     }
     const handleClose = (event, reason) => {
         if (reason === 'clickaway') {
