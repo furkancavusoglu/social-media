@@ -4,11 +4,20 @@ import { Link } from "react-router-dom"
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import axios from 'axios';
-import { PostWithAuth } from '../../services/HttpService';
+import { PostWithAuth, RefreshToken } from '../../services/HttpService';
+import { useNavigate } from "react-router-dom"
 
 
 const CommentForm = ({ userId, userName, postId, setCommentRefresh }) => {
   const [text, setText] = useState("")
+  const navigate = useNavigate()
+  const logout = () => {
+    localStorage.removeItem("tokenKey")
+    localStorage.removeItem("currentUser")
+    localStorage.removeItem("userName")
+    localStorage.removeItem("refreshToken")
+    navigate(0)
+  }
 
   const handleSubmit = () => {
     saveComment()
@@ -17,7 +26,20 @@ const CommentForm = ({ userId, userName, postId, setCommentRefresh }) => {
   }
 
   const saveComment = async () => {
-    await PostWithAuth("/comments", { postId: postId, userId: userId, text: text })
+    try {
+      await PostWithAuth("/comments", { postId: postId, userId: userId, text: text })
+    } catch (error) {
+      try {
+        const response = await RefreshToken()
+        localStorage.setItem("tokenKey", response.data.accessToken)
+        saveComment()
+      } catch (error) {
+        console.log("refresh token is not valid");
+        logout()
+      }
+      // if(error.error==="Unauthorized"){}
+    }
+
   }
 
 

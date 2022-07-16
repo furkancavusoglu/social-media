@@ -18,7 +18,7 @@ public class JwtTokenProvider {
 
     public String generateJwtToken(Authentication auth) {
         JwtUserDetails userDetails = (JwtUserDetails) auth.getPrincipal();
-        Date expireDate = new Date(new Date().getTime() + EXPIRES_IN);
+        Date expireDate = new Date(new Date().getTime() + EXPIRES_IN*1000);
         return Jwts.builder()
                 .setSubject(Long.toString(userDetails.getId()))
                 .setExpiration(expireDate)
@@ -45,4 +45,10 @@ public class JwtTokenProvider {
         return expiration.before(new Date());
     }
 
+    public String generateJwtTokenByUserId(Long userId) {
+        Date expireDate = new Date(new Date().getTime() + EXPIRES_IN);
+        return Jwts.builder().setSubject(Long.toString(userId))
+                .setIssuedAt(new Date()).setExpiration(expireDate)
+                .signWith(SignatureAlgorithm.HS512, APP_SECRET).compact();
+    }
 }

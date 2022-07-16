@@ -21,8 +21,9 @@ const Auth = () => {
         const response = await PostWithAuth(`/auth/${path}`, { userName, password })
         console.log(response.data);
         localStorage.setItem("currentUser", response.data.userId)
-        localStorage.setItem("tokenKey", response.data.message)
+        localStorage.setItem("tokenKey", response.data.accessToken)
         localStorage.setItem("userName", userName)
+        localStorage.setItem("refreshKey",response.data.refreshToken)
     }
 
     return (

@@ -1,8 +1,10 @@
 package com.project.questapp.controllers;
 
 import com.project.questapp.entities.User;
+import com.project.questapp.exceptions.UserNotFoundException;
 import com.project.questapp.responses.UserResponse;
 import com.project.questapp.services.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,8 +30,12 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public UserResponse getOneUser(@PathVariable Long userId) {
-        return new UserResponse(userService.getOneUserById(userId));
+    public UserResponse getOneUser(@PathVariable Long userId) throws UserNotFoundException {
+        User user = userService.getOneUserById(userId);
+        if(user==null){
+            throw new UserNotFoundException("User not found");
+        }
+        return new UserResponse();
     }
     @PutMapping("/{userId}")
     public User updateOneUser(@PathVariable Long userId, @RequestBody User user) {
@@ -47,5 +53,10 @@ public class UserController {
         return userService.getUserActivity(userId);
     }
 
+    @ExceptionHandler(UserNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    private void handleUserNotFound(){
+        
+    }
 
 }
